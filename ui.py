@@ -302,16 +302,6 @@ class UI:
                 command=lambda i=item: self.delete_item(i)
             )
             delete_btn.pack(side="right")
-
-            # rowだけにbind
-            row.bind("<ButtonPress-1>", self.drag_start)
-            row.bind("<B1-Motion>", self.drag_motion)
-            row.bind("<ButtonRelease-1>", self.drag_stop)
-
-            # labelクリックでもrow扱いにする
-            label.bind("<ButtonPress-1>", self.drag_start)
-            label.bind("<B1-Motion>", self.drag_motion)
-            label.bind("<ButtonRelease-1>", self.drag_stop)
             
     def delete_item(self, text):
         self.list_manager.remove(text)
@@ -340,78 +330,3 @@ class UI:
 
         with open(path, "w") as f:
             json.dump(data, f)
-
-    def drag_start(self, event):
-
-        widget = event.widget
-
-        while widget is not None:
-
-            if hasattr(widget, "item"):
-                self.drag_row = widget
-                break
-
-            widget = widget.master
-
-        self.drag_start_y = event.y_root
-
-    def drag_stop(self, event):
-
-        self.drag_row = None
-
-    def drag_motion(self, event):
-
-        if self.drag_row is None:
-            return
-
-        container = self.drag_row.master
-        rows = container.winfo_children()
-
-        y = event.y_root
-
-        for r in rows:
-
-            if r == self.drag_row:
-                continue
-
-            top = r.winfo_rooty()
-            bottom = top + r.winfo_height()
-
-            if top < y < bottom:
-
-                drag_index = rows.index(self.drag_row)
-                target_index = rows.index(r)
-
-                # 下方向移動
-                if drag_index < target_index:
-                    self.drag_row.pack(after=r)
-
-                # 上方向移動
-                else:
-                    self.drag_row.pack(before=r)
-
-                break
-        
-    def activate(self):
-
-        self.root.deiconify()
-
-        self.root.attributes("-topmost", True)
-        self.root.lift()
-
-        self.root.after(10, lambda: self.root.attributes("-topmost", False))
-
-        self.root.focus_force()
-        self.entry.focus_set()
-        
-
-    def get_row_widget(self, widget):
-
-        while widget is not None:
-
-            if widget.master == self.list_frame:
-                return widget
-
-            widget = widget.master
-
-        return None
