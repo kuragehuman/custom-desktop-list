@@ -41,3 +41,24 @@ class ListManager:
         if text in self.items:
             self.items.remove(text)
             self.save()
+    def move(self, item, target):
+
+        items = self.items
+
+        if item not in items or target not in items:
+            return
+
+        items.remove(item)
+
+        index = items.index(target)
+
+        items.insert(index, item)
+
+        self.save()
+    def move_index(self, from_i, to_i):
+
+        item = self.items.pop(from_i)
+
+        self.items.insert(to_i, item)
+
+        self.save()
