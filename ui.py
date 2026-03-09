@@ -5,7 +5,7 @@ from list_manager import ListManager
 from tray import TrayIcon
 import json
 import os
-from hotkey import HotkeyListener
+# from hotkey import HotkeyListener
 
 def get_corner_workarea(corner):
 
@@ -118,8 +118,8 @@ class UI:
         self.tray.run()
 
         # hotkey
-        self.hotkey = HotkeyListener(self)
-        self.hotkey.start()
+        # self.hotkey = HotkeyListener(self)
+        # self.hotkey.start()
 
         self.update_position()
 
@@ -212,6 +212,8 @@ class UI:
             self.root.after(delay, animate, step + 1)
 
         animate()
+        
+        self.entry.focus_set()      # 入力欄にフォーカス
 
     # ----------------------
     # slide out
