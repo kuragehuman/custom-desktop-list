@@ -1,10 +1,25 @@
 import json
 import os
 
+def get_config_path():
+
+    appdata = os.getenv("APPDATA")
+
+    if not appdata:
+        appdata = os.path.expanduser("~")
+
+    base = os.path.join(appdata, "custom-desktop-list")
+
+    os.makedirs(base, exist_ok=True)
+
+    return os.path.join(base, "config.json")
+
+
 
 class ListManager:
 
-    def __init__(self):
+    def __init__(self, app):
+        self.app = app
         appdata = os.getenv("APPDATA")
         self.folder = os.path.join(appdata, "custom-desktop-list")
         self.file = os.path.join(self.folder, "list.json")
@@ -62,3 +77,43 @@ class ListManager:
         self.items.insert(to_i, item)
 
         self.save()
+    
+    def reset(self):
+
+        config_path = get_config_path()
+
+        try:
+
+            if os.path.exists(self.file):
+                os.remove(self.file)
+
+            if os.path.exists(config_path):
+                os.remove(config_path)
+
+            self.items = []
+
+        except Exception as e:
+            print("reset error:", e)
+    
+    def load_config(self):
+
+        path = get_config_path()
+
+        if os.path.exists(path):
+
+            with open(path, "r") as f:
+                data = json.load(f)
+
+                self.app.position = data.get("position", self.app.position)
+
+
+    def save_config(self):
+
+        path = get_config_path()
+
+        data = {
+            "position": self.app.position
+        }
+
+        with open(path, "w") as f:
+            json.dump(data, f)

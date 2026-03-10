@@ -4,9 +4,37 @@ import threading
 
 
 def create_image():
-    image = Image.new("RGB", (64, 64), "white")
+
+    size = 64
+    image = Image.new("RGB", (size, size), "white")
     draw = ImageDraw.Draw(image)
-    draw.rectangle((16, 16, 48, 48), fill="red")
+
+    # 外枠
+    margin = 6
+    draw.rectangle(
+        (margin, margin, size - margin, size - margin),
+        outline="black",
+        width=3
+    )
+
+    # 行の位置
+    rows = [20, 32, 44]
+
+    for y in rows:
+
+        # テキスト線
+        draw.line(
+            (14, y, 38, y),
+            fill="black",
+            width=3
+        )
+
+        # 赤い削除ボタン
+        draw.ellipse(
+            (42, y - 4, 50, y + 4),
+            fill="red"
+        )
+
     return image
 
 
@@ -53,6 +81,7 @@ class TrayIcon:
             ),
 
             pystray.Menu.SEPARATOR,
+            pystray.MenuItem('リスト・設定の削除', self.app.clear_list),
 
             pystray.MenuItem("終了", self.quit_app)
         )

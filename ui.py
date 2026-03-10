@@ -57,14 +57,6 @@ def get_corner_workarea(corner):
 
     return r.left, r.top, r.right, r.bottom
 
-def get_config_path():
-
-    base = os.path.join(os.getenv("APPDATA"), "desktop_list")
-
-    os.makedirs(base, exist_ok=True)
-
-    return os.path.join(base, "config.json")
-
 def get_work_area():
     user32 = ctypes.windll.user32
     rect = ctypes.wintypes.RECT()
@@ -84,8 +76,6 @@ class UI:
         self.side = "left"
         self.position = "bottom_left"
 
-        self.load_config()
-
         # animation
         self.animating = False
         self.visible = False
@@ -100,7 +90,9 @@ class UI:
         self.frame = ctk.CTkFrame(self.root)
         self.frame.pack(fill="both", expand=True)
 
-        self.list_manager = ListManager()
+        self.list_manager = ListManager(self)
+
+        self.list_manager.load_config()
 
         # input
         self.entry = ctk.CTkEntry(self.frame, placeholder_text="Add item...")
@@ -156,7 +148,7 @@ class UI:
     def set_position(self, pos):
         self.position = pos
         self.update_position()
-        self.save_config()
+        self.list_manager.save_config()
         
     # ----------------------
     # easing functions
@@ -283,7 +275,7 @@ class UI:
     def refresh_list(self):
 
         for widget in self.list_frame.winfo_children():
-            widget.destroy()
+            widget.after(0, widget.destroy)
 
         for item in self.list_manager.get_items():
 
@@ -309,26 +301,8 @@ class UI:
         self.list_manager.remove(text)
         self.refresh_list()
 
-
-    def load_config(self):
-
-        path = get_config_path()
-
-        if os.path.exists(path):
-
-            with open(path, "r") as f:
-                data = json.load(f)
-
-                self.position = data.get("position", self.position)
-
-
-    def save_config(self):
-
-        path = get_config_path()
-
-        data = {
-            "position": self.position
-        }
-
-        with open(path, "w") as f:
-            json.dump(data, f)
+    def clear_list(self):
+        self.list_manager.reset()
+        self.refresh_list()
+        self.position = "bottom_left"
+        self.update_position()
