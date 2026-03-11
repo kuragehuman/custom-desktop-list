@@ -282,8 +282,9 @@ class UI:
             row = ctk.CTkFrame(self.list_frame)
             row.item = item
             row.pack(fill="x", pady=2)
+            display_text = self.shorten_text(item)
 
-            label = ctk.CTkLabel(row, text=item, anchor="w")
+            label = ctk.CTkLabel(row, text=display_text, anchor="w")
             label.pack(side="left", fill="x", expand=True, padx=5)
 
             delete_btn = ctk.CTkButton(
@@ -306,3 +307,9 @@ class UI:
         self.refresh_list()
         self.position = "bottom_left"
         self.update_position()
+
+    # 文字列短縮
+    def shorten_text(self, text, max_len=16):
+        if len(text) <= max_len:
+            return text
+        return text[:max_len-1] + "…"
